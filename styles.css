@@ -47,6 +47,23 @@ body {
     background-color: #d32f2f;
 }
 
+/* Add a little extra space between buttons */
+.delete-marker-btn,
+.edit-marker-btn {
+    margin-top: 5px;
+}
+
+/* Style the edit form */
+.edit-form {
+    display: none;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 5px;
+    position: absolute;
+    z-index: 1000;
+}
+
 .leaflet-popup-content-wrapper {
     border-radius: 10px;
 }
@@ -118,4 +135,3 @@ body {
 .custom-marker-form button:hover {
     background-color: #2980b9;
 }
-

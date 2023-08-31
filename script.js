@@ -30,21 +30,25 @@ function fetchMarkers() {
                 const description = marker.description;
                 const id = marker.id;
 
-                const popupContent = document.createElement('div');
-                popupContent.innerHTML = `<strong>${title}</strong><br>${description}<br>` +
-                    `<button class="delete-marker-btn" data-id="${id}">Delete</button>`;
+                const popupContent = `<div><strong>${title}</strong><br>${description}` +
+                    `<br><button class="edit-marker-btn" data-id="${id}">Edit</button>` +
+                    `<button class="delete-marker-btn" data-id="${id}">Delete</button></div>`;
 
+                // Create a new marker with the title and description
                 const newMarker = L.marker(latlng)
                     .addTo(map)
                     .bindPopup(popupContent) // Use the prepared popup content
                     .openPopup();
 
-                // Attach the event listener to the delete button in the popup
-                popupContent.querySelector('.delete-marker-btn').addEventListener('click', function () {
+                // Add event listener for clicking on edit buttons within popups
+                newMarker.getPopup().getElement().querySelector('.edit-marker-btn').addEventListener('click', function () {
+                    openEditMarkerForm(newMarker);
+                });
+
+                // Add event listener for clicking on delete buttons within popups
+                newMarker.getPopup().getElement().querySelector('.delete-marker-btn').addEventListener('click', function () {
                     const markerId = this.getAttribute('data-id');
                     deleteMarker(markerId);
-                    map.closePopup(); // Close the popup after deleting
-                    fetchMarkers(); // Refresh the markers on the map
                 });
             });
         });
@@ -130,3 +134,57 @@ function deleteMarker(id) {
             location.reload();
         });
 }
+
+function openEditMarkerForm(marker) {
+    const popup = marker.getPopup();
+
+    const id = marker.options.id;
+    const title = marker.options.title;
+    const description = marker.options.description;
+
+    const editForm = `
+        <div>
+            <input type="text" class="marker-title" value="${title}">
+            <textarea class="marker-description">${description}</textarea>
+            <button class="save-edit-marker-btn" data-id="${id}">Save</button>
+            <button class="cancel-edit-marker-btn">Cancel</button>
+        </div>
+    `;
+
+    popup.setContent(editForm);
+
+    const titleElement = popup.getElement().querySelector('.marker-title');
+    const descriptionElement = popup.getElement().querySelector('.marker-description');
+
+    popup.getElement().querySelector('.save-edit-marker-btn').addEventListener('click', function () {
+        const updatedTitle = titleElement.value;
+        const updatedDescription = descriptionElement.value;
+        updateMarkerInDatabase(id, updatedTitle, updatedDescription);
+    });
+
+    popup.getElement().querySelector('.cancel-edit-marker-btn').addEventListener('click', function () {
+        popup.setContent(`<div><strong>${title}</strong><br>${description}<br><button class="delete-marker-btn" data-id="${id}">Delete</button><button class="edit-marker-btn" data-id="${id}">Edit</button></div>`);
+    });
+}
+
+// Update the marker in the database
+function updateMarkerInDatabase(marker) {
+    const id = marker.id;
+    const title = marker.title;
+    const description = marker.description;
+
+    fetch('update_marker.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'id=' + id + '&title=' + title + '&description=' + description,
+    })
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+            fetchMarkers(); // Refresh the markers on the map
+        });
+}
+
+
