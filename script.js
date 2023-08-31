@@ -9,13 +9,25 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Add event listener for clicking on the map
 map.on('click', function (e) {
-    addMarker(e.latlng);
+    openCustomMarkerForm(e.latlng);
 });
 
-// Add marker function
-function addMarker(latlng) {
-    L.marker(latlng)
-        .addTo(map)
-        .bindPopup('A new marker!') // You can customize the popup content
-        .openPopup();
+function openCustomMarkerForm(latlng) {
+    var modal = document.getElementById('marker-form');
+    modal.style.display = 'block';
+
+    var closeButton = document.getElementsByClassName('close')[1];
+    closeButton.onclick = function () {
+        closeModal(modal);
+    };
+
+    var form = document.getElementById('custom-marker-form');
+    form.onsubmit = function (event) {
+        event.preventDefault();
+        var title = document.getElementById('marker-title').value;
+        var description = document.getElementById('marker-description').value;
+
+        addCustomMarkerToDatabase(latlng, title, description); // Save data to the database
+        closeModal(modal);
+    };
 }
