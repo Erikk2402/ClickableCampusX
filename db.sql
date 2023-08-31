@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS map_notes_db;
+USE map_notes_db;
+
+CREATE TABLE IF NOT EXISTS locations (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  latitude DECIMAL(10, 6) NOT NULL,
+  longitude DECIMAL(10, 6) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
