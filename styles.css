@@ -3,6 +3,7 @@
 body {
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 .container {
@@ -14,46 +15,34 @@ body {
 
 #map {
     width: 100%;
-    height: 100vh;
+    height: 100%;
 }
 
-.custom-marker-form {
+.modal {
     display: none;
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 300px;
-    z-index: 1000;
-}
-
-.custom-marker-form label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.custom-marker-form input[type="text"] {
+    z-index: 1;
+    left: 0;
+    top: 0;
     width: 100%;
-    padding: 5px;
-    margin-bottom: 10px;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
-.custom-marker-form button[type="submit"] {
-    background-color: #4caf50;
-    color: white;
-    padding: 8px 15px;
-    border: none;
+.modal-content {
+    background-color: #fefefe;
+    margin: 20% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    max-width: 400px;
+    z-index: 1;
+}
+
+.close-marker-form {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
     cursor: pointer;
-}
-
-.custom-marker-form button[type="submit"]:hover {
-    background-color: #45a049;
-}
-
-.custom-marker-form button[type="submit"]:focus {
-    outline: none;
 }
