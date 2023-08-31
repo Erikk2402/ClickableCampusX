@@ -3,71 +3,74 @@ var map = L.map('map').setView([53.41874, -7.90476], 18);
 
 // Add the tile layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-    maxZoom: 19
+  attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+  maxZoom: 19
 }).addTo(map);
 
-// Load map data from the server and create markers
+// Load map data from the server
 fetch('server.php')
-    .then(response => response.json())
-    .then(data => {
-        data.forEach(location => {
-            L.marker([location.lat, location.lng])
-                .bindPopup(`<b>${location.title}</b><br>${location.description}`)
-                .addTo(map);
-        });
-    });
-
-// Open the custom marker form with title and description
-function openCustomMarkerForm(latlng) {
-    var markerForm = document.getElementById('marker-form');
-    markerForm.style.display = 'block';
-
-    var form = document.getElementById('custom-marker-form');
-    form.onsubmit = function (event) {
-        event.preventDefault();
-        var title = document.getElementById('custom-marker-title').value;
-        var description = document.getElementById('custom-marker-description').value;
-
-        addCustomMarkerToDatabase(latlng, title, description);
-        addCustomMarkerToMap(latlng, title, description);
-        closeModal(markerForm);
-    };
-
-    var closeButton = document.getElementById('custom-marker-close');
-    closeButton.onclick = function () {
-        closeModal(markerForm);
-    };
-}
-
-// Close the modal
-function closeModal(modal) {
-    modal.style.display = 'none';
-}
-
-// Add a custom marker to the map
-function addCustomMarkerToMap(latlng, title, description) {
-    L.marker(latlng)
-        .bindPopup(`<b>${title}</b><br>${description}`)
+  .then(response => response.json())
+  .then(data => {
+    data.forEach(location => {
+      L.marker([location.lat, location.lng])
+        .bindPopup(location.title)
         .addTo(map);
-}
-
-// Add a custom marker to the database
-function addCustomMarkerToDatabase(latlng, title, description) {
-    fetch('server.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `lat=${latlng.lat}&lng=${latlng.lng}&title=${title}&description=${description}`,
-    })
-        .then(response => response.text())
-        .then(data => {
-            console.log(data);
-        });
-}
+    });
+  });
 
 // Add event listener for clicking on the map
 map.on('click', function (e) {
-    openCustomMarkerForm(e.latlng);
+  openCustomMarkerForm(e.latlng);
 });
+
+// Open the custom marker form
+function openCustomMarkerForm(latlng) {
+  var customMarkerForm = document.getElementById('custom-marker-form');
+  var closeButton = customMarkerForm.querySelector('.close');
+  var submitButton = customMarkerForm.querySelector('#custom-marker-submit');
+  var titleInput = customMarkerForm.querySelector('#custom-marker-title');
+  var descriptionInput = customMarkerForm.querySelector('#custom-marker-description');
+  var latInput = customMarkerForm.querySelector('#custom-marker-lat');
+  var lngInput = customMarkerForm.querySelector('#custom-marker-lng');
+
+  customMarkerForm.style.display = 'block';
+  latInput.value = latlng.lat;
+  lngInput.value = latlng.lng;
+
+  closeButton.onclick = function () {
+    closeCustomMarkerForm();
+  };
+
+  submitButton.onclick = function (event) {
+    event.preventDefault();
+    saveCustomMarker(latlng);
+  };
+}
+
+// Close the custom marker form
+function closeCustomMarkerForm() {
+  var customMarkerForm = document.getElementById('custom-marker-form');
+  customMarkerForm.style.display = 'none';
+}
+
+// Save custom marker to the database
+function saveCustomMarker(latlng) {
+  var title = titleInput.value;
+  var description = descriptionInput.value;
+  var lat = latInput.value;
+  var lng = lngInput.value;
+
+  fetch('server.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'lat=' + lat + '&lng=' + lng + '&title=' + title + '&description=' + description,
+  })
+    .then(response => response.text())
+    .then(data => {
+      console.log(data);
+      // Refresh the map to display the newly added marker
+      location.reload();
+    });
+}
